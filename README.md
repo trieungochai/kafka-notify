@@ -59,3 +59,95 @@ To tie all these components together, here’s a visual representation of Kafka�
 ![Visualizing Kafka’s event streaming Architecture](img/Kafka_Architecture_Transparent_V2.png)
 
 > Visualizing Kafka’s event streaming Architecture
+
+---
+
+## Set up the project workspace for your Kafka-based notification system
+
+### 1. Create the Project Directory
+
+First, create a directory for the project called `kafka-notify` and navigate into it.
+
+```bash
+mkdir kafka-notify && cd kafka-notify
+```
+
+### 2. Download the Kafka Docker Compose File
+
+Pull the `docker-compose.yml` file for Kafka from [Bitnami's repository](https://hub.docker.com/r/bitnami/kafka/).
+
+```bash
+curl -sSL https://raw.githubusercontent.com/bitnami/containers/main/bitnami/kafka/docker-compose.yml > docker-compose.yml
+```
+
+### 3. Modify the `docker-compose.yml` File
+
+Before starting Kafka, we need to modify a setting in the `docker-compose.yml` file.
+
+- Open the `docker-compose.yml` file in your text editor.
+- Find the following line:
+
+  ```yaml
+  KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://:9092
+  ```
+
+- Replace it with:
+  ```yaml
+  KAFKA_CFG_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092
+  ```
+  This change ensures Kafka advertises its listener on localhost, allowing our local Go application to connect seamlessly.
+
+### 4. Start the Kafka Broker
+
+Run the following command to start the container in detached mode:
+
+```bash
+docker-compose up -d
+```
+
+This will download and start the Kafka container in the background.
+
+### 5. Create Project Directories
+
+Create the necessary directories to organize your project files. The directories `cmd/producer` and `cmd/consumer` will contain the producer and consumer application files, and `pkg/models` will store the model declarations.
+
+```bash
+mkdir -p cmd/producer cmd/consumer pkg/models
+```
+
+### 6. 6. Initialize Go Modules
+
+Initialize a Go module for our project and install the necessary dependencies. In this case, we'll be using sarama (a Kafka client for Go) and gin (a web framework for Go) for the application.
+
+Initialize the Go module:
+
+```bash
+go mod init kafka-notify
+```
+
+Install the required Go packages:
+
+```bash
+go get github.com/IBM/sarama github.com/gin-gonic/gin
+```
+
+### 7. Project Structure Overview
+
+The project structure should look like this:
+
+```
+kafka-notify/
+├── cmd/
+│ ├── producer/
+│ └── consumer/
+├── pkg/
+│ └── models/
+├── docker-compose.yml
+├── go.mod
+```
+
+- `cmd/producer/`: This directory will contain the Go code for the producer (to send messages to Kafka).
+- `cmd/consumer/`: This directory will contain the Go code for the consumer (to read messages from Kafka).
+- `pkg/models/`: This directory will hold your data models (such as notification structures).
+- `docker-compose.yml`: The configuration for Docker to run Kafka.
+- `go.mod`: The Go module file that tracks dependencies.
